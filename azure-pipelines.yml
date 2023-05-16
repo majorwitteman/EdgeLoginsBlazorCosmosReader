@@ -24,4 +24,5 @@ steps:
     azureSubscription: 'Az - R&D-EdgeLoginsFunction'
     appType: 'webAppLinux'
     appName: 'edgeloginsapp'
+    resourceGroupName: 'rw-edgelogins'
     package: '$(Build.StagingDirectory)/**/*.zip'
