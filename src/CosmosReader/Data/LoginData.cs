@@ -13,6 +13,7 @@ class LoginData
     [JsonProperty(PropertyName = "profileName")]
     public string? ProfileName { get; set; }
     public int FileSize { get; set; }
+    public int FileSizeInKB => FileSize / 1024;
     public Login[]? Logins { get; set; }
     public int LoginsSavedCount => Logins?.Where(l => l.NeverRemember == false).Count() > 0 ? Logins.Where(l => l.NeverRemember == false).Count() : 0;
     public int LoginsBlockedCount => Logins?.Where(l => l.NeverRemember == true).Count() > 0 ? Logins.Where(l => l.NeverRemember == true).Count() : 0;

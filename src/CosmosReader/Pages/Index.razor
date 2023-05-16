@@ -41,6 +41,11 @@
             <RadzenDataGridColumn TItem="LoginData" Property="ProfileName" Title="Profile Name" />
             <RadzenDataGridColumn TItem="LoginData" Property="LoginsSavedCount" Title="# of Saved" SortOrder="SortOrder.Descending" />
             <RadzenDataGridColumn TItem="LoginData" Property="LoginsBlockedCount" Title="# of Blocked" />
+            <RadzenDataGridColumn TItem="LoginData" Property="FileSize" Title="FileSize">
+                <Template Context="Login">
+                    @String.Format("{0} KB", Login.FileSizeInKB)
+                </Template>
+            </RadzenDataGridColumn>
         </Columns>
     </RadzenDataGrid>
 }

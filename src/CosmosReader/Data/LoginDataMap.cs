@@ -11,5 +11,6 @@ class LoginDataMap : ClassMap<LoginData>
         Map(m => m.ProfileName).Index(2).Name("profileName");
         Map(m => m.LoginsSavedCount).Index(3).Name("countOfSaved");
         Map(m => m.LoginsBlockedCount).Index(4).Name("countOfBlocked");
+        Map(m => m.FileSizeInKB).Index(5).Name("fileSizeInKB");
     }
 }
