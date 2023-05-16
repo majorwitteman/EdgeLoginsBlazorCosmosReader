@@ -1,0 +1,26 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(System.DefaultWorkingDirectory)\src\CosmosReader'
+    arguments: '-c Release'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: publish
+    publishWebProjects: true
+    arguments: '--configuration Release --self-contained --output $(Build.StagingDirectory'
+    zipAfterPublish: true
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'Az - R&D-EdgeLoginsFunction'
+    appType: 'webAppLinux'
+    appName: 'edgeloginsapp'
+    package: '$(Build.StagingDirectory)/**/*.zip'
