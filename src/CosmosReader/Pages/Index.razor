@@ -1,0 +1,56 @@
+﻿@page "/"
+@inject CosmosService _cosmos;
+
+<PageTitle>Index</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+<p>
+<RadzenButton Text="Load Data" Click=@LoadData hidden="@hideButton" />
+
+@if (inProgress)
+{
+    <div class="spinner-border text-primary" role="status">
+    </div>
+}
+@if (data is not null)
+{
+    <RadzenDataGrid @ref="grid" RowRender="@RowRender" ExpandMode="@DataGridExpandMode.Single" Data="@data" TItem="LoginData" AllowSorting="true" AllowMultiColumnSorting="true">
+        <Template Context="loginData">
+            <RadzenDataGrid Data="@loginData.Logins" TItem="Login">
+                <RadzenDataGridColumn TItem="Login" Property="OriginUrl" Title="URL" />
+            </RadzenDataGrid>
+        </Template>
+        <Columns>
+            <RadzenDataGridColumn TItem="LoginData" Property="ComputerName" Title="Computer Name" />
+            <RadzenDataGridColumn TItem="LoginData" Property="Username" Title="Username" />
+            <RadzenDataGridColumn TItem="LoginData" Property="ProfileName" Title="Profile Name" />
+            <RadzenDataGridColumn TItem="LoginData" Property="LoginsCount" Title="# of Saved" />
+        </Columns>
+    </RadzenDataGrid>
+}
+</p>
+
+@code {
+    IEnumerable<LoginData>? data;
+    RadzenDataGrid<LoginData> grid;
+    bool inProgress = false;
+    bool hideButton = false;
+
+
+    async void LoadData()
+    {
+        hideButton = true;
+        inProgress = true;
+        data = await _cosmos.GetAllDocuments();
+        inProgress = false;
+        hideButton = false;
+        StateHasChanged();
+    }
+
+    void RowRender(RowRenderEventArgs<LoginData> args)
+    {
+        
+    }
+}
