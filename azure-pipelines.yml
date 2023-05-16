@@ -8,13 +8,14 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
-    projects: '$(System.DefaultWorkingDirectory)\src\CosmosReader'
+    projects: '$(System.DefaultWorkingDirectory)\src\CosmosReader\CosmosReader.csproj'
     arguments: '-c Release'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: publish
     publishWebProjects: true
+    projects: '$(System.DefaultWorkingDirectory)\src\CosmosReader\CosmosReader.csproj'
     arguments: '--configuration Release --self-contained --output $(Build.StagingDirectory'
     zipAfterPublish: true
 
