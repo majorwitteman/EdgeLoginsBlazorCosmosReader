@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/CosmosReader/CosmosReader.csproj",
+                "${workspaceFolder}/src/CosmosReader/CosmosReader.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -19,7 +19,7 @@
             "type": "process",
             "args": [
                 "publish",
-                "${workspaceFolder}/CosmosReader/CosmosReader.csproj",
+                "${workspaceFolder}/src/CosmosReader/CosmosReader.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],
@@ -33,7 +33,7 @@
                 "watch",
                 "run",
                 "--project",
-                "${workspaceFolder}/CosmosReader/CosmosReader.csproj"
+                "${workspaceFolder}/src/CosmosReader/CosmosReader.csproj"
             ],
             "problemMatcher": "$msCompile"
         }

@@ -1,11 +1,18 @@
 ﻿@page "/"
 @inject CosmosService _cosmos;
+@inject IJSRuntime JS;
+@using CsvHelper;
+@using System.Globalization;
 
 <PageTitle>Edge Logins Data</PageTitle>
 
 <h1 class="pb-3">Edge Logins Data</h1>
 <p>
 <RadzenButton Text="Load Data" Click=@LoadData IsBusy="@hideButton" BusyText="Loading..." class="w-25" />
+@if (data is not null) 
+{
+    <RadzenButton Text="Export to CSV" Click=@DownloadLoginDataCsv class="w-25" />
+}
 </p>
 @if (data is not null) { 
     <p><strong> Item Count - @data.Count()</strong></p>
@@ -55,6 +62,44 @@
     void RowRender(RowRenderEventArgs<LoginData> args)
     {
         args.Expandable = args.Data.LoginsTotalCount > 0;
+    }
+
+    MemoryStream WriteLoginDataCsv()
+    {
+        MemoryStream memStream = new();
+
+        using var writer = new StreamWriter(memStream);
+
+        using CsvWriter csv = new(writer,CultureInfo.InvariantCulture);
+
+        csv.Context.RegisterClassMap<LoginDataMap>();
+        csv.WriteRecords(data);
+
+        return memStream;
+    }
+
+    @* async void DownloadLoginDataCsv()
+    {
+        var stream = WriteLoginDataCsv();
+        using var streamRef = new DotNetStreamReference(stream: stream);
+        await JS.InvokeVoidAsync("downloadFileFromStream", "LoginDataCounts.csv", streamRef);
+    } *@
+
+    async Task DownloadLoginDataCsv()
+    {
+        MemoryStream memStream = new();
+
+        using var writer = new StreamWriter(memStream);
+
+        using CsvWriter csv = new(writer,CultureInfo.InvariantCulture);
+
+        csv.Context.RegisterClassMap<LoginDataMap>();
+        csv.WriteRecords(data);
+
+        string fileName = "LoginDataCounts.csv";
+        string contentType = "text/plain";
+
+        await JS.InvokeVoidAsync("downloadFile", fileName, contentType, memStream.ToArray());
     }
 }
 
