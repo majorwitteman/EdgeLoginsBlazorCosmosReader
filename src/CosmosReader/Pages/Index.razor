@@ -7,14 +7,17 @@
 <PageTitle>Edge Logins Data</PageTitle>
 
 <h1 class="pb-3">Edge Logins Data</h1>
-<p>
-<RadzenButton Text="Load Data" Click=@LoadData IsBusy="@hideButton" BusyText="Loading..." class="w-25" />
-@if (data is not null) 
-{
-    <RadzenButton Text="Export to CSV (Counts)" Click=@DownloadLoginDataCountsCsv class="w-25" />
-    <RadzenButton Text="Export to CSV (w/ Logins)" Click=@DownloadLoginDataFullCsv class="w-25" />
-}
-</p>
+<div class="container pb-3 w-100 m-0 p-0">
+    <div class="row justify-content-start">
+        <div class="col-3"><RadzenButton Text="Load Data" Click=@LoadData IsBusy="@hideLoadButton" BusyText="Loading..." class="w-100" /></div>
+        @if (data is not null) 
+        {
+            <div class="col-3"><RadzenButton Text="Export to CSV (Counts)" Click=@DownloadLoginDataCountsCsv class="w-100" /></div>
+            <div class="col-3"><RadzenButton Text="Export to CSV (w/ Logins)" Click=@DownloadLoginDataFullCsv class="w-100" /></div>
+            <div class="col-3"><RadzenButton Text="Export to CSV (Selected)" Click=@DownloadUserLoginsCsv class="w-100" Disabled="@disableExportButton" /></div>
+        }
+    </div>
+</div>
 @if (data is not null) { 
     <p><strong> Item Count - @data.Count()</strong></p>
 }
@@ -24,7 +27,7 @@
 {
     <RadzenDataGrid @ref="grid" RowRender="@RowRender" ExpandMode="@DataGridExpandMode.Multiple" 
         Data="@data" TItem="LoginData" AllowSorting="true" AllowMultiColumnSorting="true"
-        AllowPaging="true" PageSize="15" AllowFiltering="true">
+        AllowPaging="true" PageSize="15" AllowFiltering="true" SelectionMode="DataGridSelectionMode.Single" RowSelect="@SelectRow">
         <Template Context="LoginData">
             <RadzenDataGrid Data="@LoginData.Logins" TItem="Login" AllowSorting="true" AllowMultiColumnSorting="true"
                 AllowPaging="true" PageSize="10" AllowFiltering="true">
@@ -54,20 +57,28 @@
 @code {
     IEnumerable<LoginData>? data;
     RadzenDataGrid<LoginData>? grid;
-    bool hideButton = false;
+    LoginData? selectedRow;
+    bool hideLoadButton = false;
+    bool disableExportButton = true;
 
     async void LoadData()
     {
         data = null;
-        hideButton = true;
+        hideLoadButton = true;
         data = await _cosmos.GetAllDocuments();
-        hideButton = false;
+        hideLoadButton = false;
         StateHasChanged();
     }
 
     void RowRender(RowRenderEventArgs<LoginData> args)
     {
         args.Expandable = args.Data.LoginsTotalCount > 0;
+    }
+
+    void SelectRow(LoginData row)
+    {
+        disableExportButton = false;
+        selectedRow = row;
     }
 
     async Task DownloadLoginDataCountsCsv()
@@ -106,6 +117,30 @@
         csv.WriteRecords(dataFull);
 
         string fileName = "LoginDataWithUrls.csv";
+        string contentType = "text/plain";
+
+        await JS.InvokeVoidAsync("downloadFile", fileName, contentType, memStream.ToArray());
+    }
+
+    async Task DownloadUserLoginsCsv()
+    {
+        if (selectedRow is null) { return; }
+        var userData = selectedRow;
+        List<LoginDataFull> dataFull = new();
+        
+        var obj = LoginDataFull.GetFullData(userData);
+        dataFull.AddRange(obj);
+
+        MemoryStream memStream = new();
+
+        using var writer = new StreamWriter(memStream);
+
+        using CsvWriter csv = new(writer,CultureInfo.InvariantCulture);
+
+        csv.Context.RegisterClassMap<LoginDataFullMap>();
+        csv.WriteRecords(dataFull);
+
+        string fileName = String.Concat(userData.Username,"-",userData.ComputerName,"-",userData.ProfileName,".csv");
         string contentType = "text/plain";
 
         await JS.InvokeVoidAsync("downloadFile", fileName, contentType, memStream.ToArray());
