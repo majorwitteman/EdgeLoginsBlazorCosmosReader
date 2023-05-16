@@ -26,3 +26,5 @@ steps:
     appName: 'edgeloginsapp'
     resourceGroupName: 'rw-edgelogins'
     package: '$(Build.StagingDirectory)/**/*.zip'
+    appSettings: 
+      -COSMOS_ENDPOINT 'https://rwedgeloginscosmos.documents.azure.com:443/
