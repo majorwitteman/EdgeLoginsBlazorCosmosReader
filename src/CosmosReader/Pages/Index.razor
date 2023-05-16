@@ -16,11 +16,12 @@
 {
     <RadzenDataGrid @ref="grid" RowRender="@RowRender" ExpandMode="@DataGridExpandMode.Multiple" 
         Data="@data" TItem="LoginData" AllowSorting="true" AllowMultiColumnSorting="true"
-        AllowPaging="true" PageSize="15">
+        AllowPaging="true" PageSize="15" AllowFiltering="true">
         <Template Context="LoginData">
-            <RadzenDataGrid Data="@LoginData.Logins" TItem="Login">
+            <RadzenDataGrid Data="@LoginData.Logins" TItem="Login" AllowSorting="true" AllowMultiColumnSorting="true"
+                AllowPaging="true" PageSize="10" AllowFiltering="true">
                 <Columns>
-                    <RadzenDataGridColumn TItem="Login" Property="OriginUrl" Title="URL" />
+                    <RadzenDataGridColumn TItem="Login" Property="OriginUrl" Title="URL" FilterProperty="OriginUrl.ToString()" />
                     <RadzenDataGridColumn TItem="Login" Property="UserName" Title="Username" />
                     <RadzenDataGridColumn TItem="Login" Property="NeverRemember" Title="Never Remember" />
                 </Columns>
