@@ -1,0 +1,30 @@
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: DotNetCoreCLI@2
+  inputs:
+    command: 'build'
+    projects: '$(System.DefaultWorkingDirectory)/src/CosmosReader/CosmosReader.csproj'
+    arguments: '-c Release'
+
+- task: DotNetCoreCLI@2
+  inputs:
+    command: publish
+    publishWebProjects: true
+    projects: '$(System.DefaultWorkingDirectory)/src/CosmosReader/CosmosReader.csproj'
+    arguments: '--configuration Release --self-contained --output $(Build.StagingDirectory)'
+    zipAfterPublish: true
+
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'Az - R&D-EdgeLoginsFunction'
+    appType: 'webAppLinux'
+    appName: 'edgeloginsapp'
+    resourceGroupName: 'rw-edgelogins'
+    package: '$(Build.StagingDirectory)/**/*.zip'
+    appSettings: 
+      -COSMOS_ENDPOINT https://rwedgeloginscosmos.documents.azure.com:443/
