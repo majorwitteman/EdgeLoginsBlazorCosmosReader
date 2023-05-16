@@ -11,7 +11,8 @@
 <RadzenButton Text="Load Data" Click=@LoadData IsBusy="@hideButton" BusyText="Loading..." class="w-25" />
 @if (data is not null) 
 {
-    <RadzenButton Text="Export to CSV" Click=@DownloadLoginDataCsv class="w-25" />
+    <RadzenButton Text="Export to CSV (Counts)" Click=@DownloadLoginDataCountsCsv class="w-25" />
+    <RadzenButton Text="Export to CSV (w/ Logins)" Click=@DownloadLoginDataFullCsv class="w-25" />
 }
 </p>
 @if (data is not null) { 
@@ -64,21 +65,7 @@
         args.Expandable = args.Data.LoginsTotalCount > 0;
     }
 
-    MemoryStream WriteLoginDataCsv()
-    {
-        MemoryStream memStream = new();
-
-        using var writer = new StreamWriter(memStream);
-
-        using CsvWriter csv = new(writer,CultureInfo.InvariantCulture);
-
-        csv.Context.RegisterClassMap<LoginDataMap>();
-        csv.WriteRecords(data);
-
-        return memStream;
-    }
-
-    async Task DownloadLoginDataCsv()
+    async Task DownloadLoginDataCountsCsv()
     {
         MemoryStream memStream = new();
 
@@ -90,6 +77,30 @@
         csv.WriteRecords(data);
 
         string fileName = "LoginDataCounts.csv";
+        string contentType = "text/plain";
+
+        await JS.InvokeVoidAsync("downloadFile", fileName, contentType, memStream.ToArray());
+    }
+
+    async Task DownloadLoginDataFullCsv()
+    {
+        if (data is null) { return; }
+        List<LoginDataFull> dataFull = new();
+        foreach (var d in data)
+        {
+            var obj = LoginDataFull.GetFullData(d);
+            dataFull.AddRange(obj);
+        }
+        MemoryStream memStream = new();
+
+        using var writer = new StreamWriter(memStream);
+
+        using CsvWriter csv = new(writer,CultureInfo.InvariantCulture);
+
+        csv.Context.RegisterClassMap<LoginDataFullMap>();
+        csv.WriteRecords(dataFull);
+
+        string fileName = "LoginDataWithUrls.csv";
         string contentType = "text/plain";
 
         await JS.InvokeVoidAsync("downloadFile", fileName, contentType, memStream.ToArray());
