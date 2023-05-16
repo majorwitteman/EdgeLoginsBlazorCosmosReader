@@ -1,5 +1,7 @@
 using Newtonsoft.Json;
 
+namespace CosmosReader.Data;
+
 class Login
 {
     [JsonProperty(PropertyName = "origin_url")]

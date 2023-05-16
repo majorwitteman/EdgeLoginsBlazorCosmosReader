@@ -1,0 +1,18 @@
+@page "/deleteAllData"
+@inject CosmosService _cosmos;
+@inject IWebHostEnvironment env;
+
+@if (env.IsDevelopment()) {
+    <RadzenButton Click="DeleteAll" Text="Delete All Data From Cosmos" /> 
+}
+
+@if (env.IsProduction()) {
+    <p>Cannot delete data from Production site</p>
+}
+
+@code {
+    async void DeleteAll()
+    {
+        await _cosmos.DeleteAllDocuments();
+    }
+}

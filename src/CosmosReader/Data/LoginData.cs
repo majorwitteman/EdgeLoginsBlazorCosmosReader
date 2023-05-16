@@ -1,5 +1,7 @@
 using Newtonsoft.Json;
 
+namespace CosmosReader.Data;
+
 class LoginData
 {
     [JsonProperty(PropertyName = "id")]
@@ -12,5 +14,7 @@ class LoginData
     public string? ProfileName { get; set; }
     public int FileSize { get; set; }
     public Login[]? Logins { get; set; }
-    public int LoginsCount => Logins?.Length > 0 ? Logins.Length : 0;
+    public int LoginsSavedCount => Logins?.Where(l => l.NeverRemember == false).Count() > 0 ? Logins.Where(l => l.NeverRemember == false).Count() : 0;
+    public int LoginsBlockedCount => Logins?.Where(l => l.NeverRemember == true).Count() > 0 ? Logins.Where(l => l.NeverRemember == true).Count() : 0;
+    public int LoginsTotalCount => Logins?.Count() > 0 ? Logins.Count() : 0;
 }

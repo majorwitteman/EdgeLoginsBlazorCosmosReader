@@ -1,6 +1,8 @@
 using Azure.Identity;
 using Microsoft.Azure.Cosmos;
 
+namespace CosmosReader.Data;
+
 class CosmosService
 {
     private readonly Container _container;
@@ -25,5 +27,15 @@ class CosmosService
         }
 
         return logins.ToArray();
+    }
+
+    public async Task DeleteAllDocuments() {
+        var documents = await GetAllDocuments();
+        foreach (var doc in documents)
+        {
+            var key = new PartitionKeyBuilder();
+            key.Add(doc.Username);
+            await  _container.DeleteItemStreamAsync(doc.Id, key.Build());
+        }
     }
 }

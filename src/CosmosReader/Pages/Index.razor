@@ -1,32 +1,37 @@
 ﻿@page "/"
 @inject CosmosService _cosmos;
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Edge Logins Data</PageTitle>
 
-<h1>Hello, world!</h1>
-
-Welcome to your new app.
+<h1 class="pb-3">Edge Logins Data</h1>
 <p>
-<RadzenButton Text="Load Data" Click=@LoadData hidden="@hideButton" />
-
-@if (inProgress)
-{
-    <div class="spinner-border text-primary" role="status">
-    </div>
+<RadzenButton Text="Load Data" Click=@LoadData IsBusy="@hideButton" BusyText="Loading..." class="w-25" />
+</p>
+@if (data is not null) { 
+    <p><strong> Item Count - @data.Count()</strong></p>
 }
+
+<p>
 @if (data is not null)
 {
-    <RadzenDataGrid @ref="grid" RowRender="@RowRender" ExpandMode="@DataGridExpandMode.Single" Data="@data" TItem="LoginData" AllowSorting="true" AllowMultiColumnSorting="true">
-        <Template Context="loginData">
-            <RadzenDataGrid Data="@loginData.Logins" TItem="Login">
-                <RadzenDataGridColumn TItem="Login" Property="OriginUrl" Title="URL" />
+    <RadzenDataGrid @ref="grid" RowRender="@RowRender" ExpandMode="@DataGridExpandMode.Multiple" 
+        Data="@data" TItem="LoginData" AllowSorting="true" AllowMultiColumnSorting="true"
+        AllowPaging="true" PageSize="15">
+        <Template Context="LoginData">
+            <RadzenDataGrid Data="@LoginData.Logins" TItem="Login">
+                <Columns>
+                    <RadzenDataGridColumn TItem="Login" Property="OriginUrl" Title="URL" />
+                    <RadzenDataGridColumn TItem="Login" Property="UserName" Title="Username" />
+                    <RadzenDataGridColumn TItem="Login" Property="NeverRemember" Title="Never Remember" />
+                </Columns>
             </RadzenDataGrid>
         </Template>
         <Columns>
-            <RadzenDataGridColumn TItem="LoginData" Property="ComputerName" Title="Computer Name" />
             <RadzenDataGridColumn TItem="LoginData" Property="Username" Title="Username" />
+            <RadzenDataGridColumn TItem="LoginData" Property="ComputerName" Title="Computer Name" />
             <RadzenDataGridColumn TItem="LoginData" Property="ProfileName" Title="Profile Name" />
-            <RadzenDataGridColumn TItem="LoginData" Property="LoginsCount" Title="# of Saved" />
+            <RadzenDataGridColumn TItem="LoginData" Property="LoginsSavedCount" Title="# of Saved" SortOrder="SortOrder.Descending" />
+            <RadzenDataGridColumn TItem="LoginData" Property="LoginsBlockedCount" Title="# of Blocked" />
         </Columns>
     </RadzenDataGrid>
 }
@@ -34,23 +39,22 @@ Welcome to your new app.
 
 @code {
     IEnumerable<LoginData>? data;
-    RadzenDataGrid<LoginData> grid;
-    bool inProgress = false;
+    RadzenDataGrid<LoginData>? grid;
     bool hideButton = false;
-
 
     async void LoadData()
     {
+        data = null;
         hideButton = true;
-        inProgress = true;
         data = await _cosmos.GetAllDocuments();
-        inProgress = false;
         hideButton = false;
         StateHasChanged();
     }
 
     void RowRender(RowRenderEventArgs<LoginData> args)
     {
-        
+        args.Expandable = args.Data.LoginsTotalCount > 0;
     }
 }
+
+
