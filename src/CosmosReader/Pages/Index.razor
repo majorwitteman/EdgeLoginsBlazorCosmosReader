@@ -78,13 +78,6 @@
         return memStream;
     }
 
-    @* async void DownloadLoginDataCsv()
-    {
-        var stream = WriteLoginDataCsv();
-        using var streamRef = new DotNetStreamReference(stream: stream);
-        await JS.InvokeVoidAsync("downloadFileFromStream", "LoginDataCounts.csv", streamRef);
-    } *@
-
     async Task DownloadLoginDataCsv()
     {
         MemoryStream memStream = new();
