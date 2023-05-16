@@ -16,7 +16,7 @@ steps:
     command: publish
     publishWebProjects: true
     projects: '$(System.DefaultWorkingDirectory)/src/CosmosReader/CosmosReader.csproj'
-    arguments: '--configuration Release --self-contained --output $(Build.StagingDirectory'
+    arguments: '--configuration Release --self-contained --output $(Build.StagingDirectory)'
     zipAfterPublish: true
 
 - task: AzureWebApp@1
