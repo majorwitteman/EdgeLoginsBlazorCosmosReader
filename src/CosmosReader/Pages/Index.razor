@@ -117,7 +117,7 @@
         csv.WriteRecords(dataFull);
 
         string fileName = "LoginDataWithUrls.csv";
-        string contentType = "text/plain";
+        string contentType = "text/csv";
 
         await JS.InvokeVoidAsync("downloadFile", fileName, contentType, memStream.ToArray());
     }
